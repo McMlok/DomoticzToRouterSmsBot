@@ -1,6 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using DomoticzToRouterSmsBot.Loader;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -8,13 +8,15 @@ namespace DomoticzToRouterSmsBot
 {
   internal class Program
   {
-    private static void Main(string[] args)
+    private static void Main()
     {
+      var configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
       //setup our DI
       var serviceProvider = new ServiceCollection()
         .AddLogging(c=>c.AddConsole())
         .AddScoped<ISmsLoader, File>()
         .AddScoped<ISmsParser, SmsParser>()
+        .AddSingleton(provider => configuration)
         .BuildServiceProvider();
 
       var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
@@ -27,7 +29,7 @@ namespace DomoticzToRouterSmsBot
       }
 
       logger.LogInformation("All done!");
-      ((IDisposable)serviceProvider)?.Dispose();
+      serviceProvider?.Dispose();
     }
   }
 }
