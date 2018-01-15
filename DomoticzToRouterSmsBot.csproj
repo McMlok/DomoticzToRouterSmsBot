@@ -2,7 +2,23 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <StartupObject>DomoticzToRouterSmsBot.Program</StartupObject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SampleData\sampleSMS.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="SampleData\sampleSMS.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
+  </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ index=19
 from=123456789
 content=Test1
 receivedTime=2017-12-06 08:15:46
-unread=0
+unread=1
 [2,0,0,0,0,0]0
 index=18
 from=123456789
@@ -15,5 +15,5 @@ index=9
 from=123456789
 content=Test3
 receivedTime=2017-01-31 23:00:57
-unread=0
+unread=1
 [error]0
