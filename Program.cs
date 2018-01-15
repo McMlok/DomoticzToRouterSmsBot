@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using DomoticzToRouterSmsBot.Loader;
+using DomoticzToRouterSmsBot.Proccessor;
+using DomoticzToRouterSmsBot.Proccessor.Commands;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,6 +18,15 @@ namespace DomoticzToRouterSmsBot
         .AddLogging(c=>c.AddConsole())
         .AddScoped<ISmsLoader, File>()
         .AddScoped<ISmsParser, SmsParser>()
+        .AddScoped<ISmsRunner, SmsRunner>()
+        .AddScoped<ToggleSwitch>()
+        .AddScoped<MarkAsRead>()
+        .AddScoped<ICommand>(provider =>
+        {
+          var c1 = provider.GetService<ToggleSwitch>();
+          ((Command) c1).Use(provider.GetService<MarkAsRead>());
+          return c1;
+        })
         .AddSingleton(provider => configuration)
         .BuildServiceProvider();
 
@@ -23,9 +34,10 @@ namespace DomoticzToRouterSmsBot
       logger.LogInformation("Starting application");
 
       var sms = serviceProvider.GetService<ISmsLoader>().Load();
+      var runner = serviceProvider.GetService<ISmsRunner>();
       foreach (var smsToProccess in sms.Where(s=>s.Unread).OrderBy(s=>s.Index))
       {
-        logger.LogInformation($"Proccessing sms {smsToProccess.Index} with message {smsToProccess.Message}");
+        runner.Run(smsToProccess);
       }
 
       logger.LogInformation("All done!");
