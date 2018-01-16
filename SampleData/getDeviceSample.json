@@ -1,0 +1,48 @@
+﻿{
+
+    "ActTime": 1474795292,
+    "ServerTime": "2016-12-23 12:21:32",
+    "Sunrise": "07:11",
+    "Sunset": "19:08",
+    "result": [
+        {
+            "AddjMulti": 1.0,
+            "AddjMulti2": 1.0,
+            "AddjValue": 0.0,
+            "AddjValue2": 0.0,
+            "BatteryLevel": 255,
+            "CustomImage": 0,
+            "Data": "0.0 C",
+            "Description": "",
+            "Favorite": 0,
+            "HardwareID": 2,
+            "HardwareName": "test",
+            "HardwareType": "Dummy (Does nothing, use for virtual switches only)",
+            "HardwareTypeVal": 15,
+            "HaveTimeout": false,
+            "ID": "14053",
+            "LastUpdate": "2016-12-23 12:21:13",
+            "Name": "Temp_test1",
+            "Notifications": "false",
+            "PlanID": "0",
+            "PlanIDs": [
+                0
+            ],
+            "Protected": false,
+            "ShowNotifications": true,
+            "SignalLevel": "-",
+            "SubType": "LaCrosse TX3",
+            "Temp": 0.0,
+            "Timers": "false",
+            "Type": "Temp",
+            "TypeImg": "temperature",
+            "Unit": 1,
+            "Used": 1,
+            "XOffset": "0",
+            "YOffset": "0",
+            "idx": "4"
+        }
+    ],
+    "status": "OK",
+    "title": "Devices"
+}

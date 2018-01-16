@@ -1,10 +1,13 @@
 ﻿using System.Linq;
+using DomoticzToRouterSmsBot.Adapters;
 using DomoticzToRouterSmsBot.Loader;
 using DomoticzToRouterSmsBot.Proccessor;
 using DomoticzToRouterSmsBot.Proccessor.Commands;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DomoticzToRouterSmsBot
 {
@@ -19,6 +22,7 @@ namespace DomoticzToRouterSmsBot
         .AddScoped<ISmsLoader, File>()
         .AddScoped<ISmsParser, SmsParser>()
         .AddScoped<ISmsRunner, SmsRunner>()
+        .AddScoped<IDomoticz, Domoticz>()
         .AddScoped<ToggleSwitch>()
         .AddScoped<MarkAsRead>()
         .AddScoped<ICommand>(provider =>
@@ -35,11 +39,10 @@ namespace DomoticzToRouterSmsBot
 
       var sms = serviceProvider.GetService<ISmsLoader>().Load();
       var runner = serviceProvider.GetService<ISmsRunner>();
-      foreach (var smsToProccess in sms.Where(s=>s.Unread).OrderBy(s=>s.Index))
+      foreach (var smsToProccess in sms.Where(s => s.Unread).OrderBy(s => s.Index))
       {
         runner.Run(smsToProccess);
       }
-
       logger.LogInformation("All done!");
       serviceProvider?.Dispose();
     }

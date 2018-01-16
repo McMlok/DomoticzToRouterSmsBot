@@ -31,7 +31,14 @@ namespace DomoticzToRouterSmsBot.Proccessor
         _logger.LogError($"Number {sms.From} is not allowed to run any command");
         return;
       }
-      _command.Handle(sms);
+      try
+      {
+        _command.Handle(sms);
+      }
+      catch (Exception e)
+      {
+        _logger.LogCritical(e.ToString());
+      }
     }
   }
 }
