@@ -28,3 +28,10 @@ switch LightOrSwitchName to ON/OFF
 * Run __sudo ln -s /opt/dotnet/dotnet /usr/local/bin`__ to set up a symbolic link...a shortcut to you Windows folks 😉 to the dotnet executable.
 * Test the installation by typing __dotnet --help__.
 
+##### Instaling bot
+```
+cd ~
+git clone https://github.com/McMlok/DomoticzToRouterSmsBot.git
+cd ~/DomoticzToRouterSmsBot
+dotner run
+```
