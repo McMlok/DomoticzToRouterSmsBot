@@ -23,6 +23,7 @@ namespace DomoticzToRouterSmsBot
         .AddScoped<ISmsParser, SmsParser>()
         .AddScoped<ISmsRunner, SmsRunner>()
         .AddScoped<IDomoticz, Domoticz>()
+        .AddScoped<ISmsUpdater, TpLinkRouter>()
         .AddScoped<ToggleSwitch>()
         .AddScoped<MarkAsRead>()
         .AddScoped<ICommand>(provider =>

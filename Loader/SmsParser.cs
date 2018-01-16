@@ -41,6 +41,11 @@ namespace DomoticzToRouterSmsBot.Loader
       return sms;
     }
 
+    public ICollection<Sms> Parse(string result)
+    {
+      return Parse(result.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries));
+    }
+
     private bool TryGetValue(Regex regex, string line, out string value)
     {
       var message = regex.Match(line);

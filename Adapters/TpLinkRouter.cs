@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using DomoticzToRouterSmsBot.Loader;
+using Microsoft.Extensions.Configuration;
+
+namespace DomoticzToRouterSmsBot.Adapters
+{
+  class TpLinkRouter : ISmsLoader, ISmsUpdater
+  {
+    private readonly ISmsParser _parser;
+    private readonly string _userName;
+    private readonly string _password;
+    private readonly string _baseUri;
+
+    private const string LoadSmsRequestData = "";
+
+    public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser)
+    {
+      _parser = parser;
+      _userName = configuration["TpLinkUserName"];
+      _password = configuration["TpLinkPassword"];
+      _baseUri = configuration["TpLinkUri"];
+    }
+
+    public ICollection<Sms> Load()
+    {
+      using (var client = new HttpClient())
+      {
+        //ADD BASIC AUTH
+        var authByteArray = Encoding.ASCII.GetBytes($"{_userName}:{_password}");
+        var authString = Convert.ToBase64String(authByteArray);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
+
+        HttpRequestMessage message =
+          new HttpRequestMessage(HttpMethod.Post, CreateLoadUri()) {Content = new StringContent(LoadSmsRequestData) };
+        var result = client.SendAsync(message).Result;
+        return _parser.Parse(result.Content.ReadAsStringAsync().Result);
+      }
+    }
+
+    private string CreateLoadUri()
+    {
+      return $"{_baseUri}cgi?5";
+    }
+
+    public void MarkAsRead(int index)
+    {
+      using (var client = new HttpClient())
+      {
+        //ADD BASIC AUTH
+        var authByteArray = Encoding.ASCII.GetBytes($"{_userName}:{_password}");
+        var authString = Convert.ToBase64String(authByteArray);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
+
+        HttpRequestMessage message =
+          new HttpRequestMessage(HttpMethod.Post, CreateLoadUri()) { Content = new StringContent(LoadSmsRequestData) };
+        //TODO: set correct data for mark as read
+        client.SendAsync(message).Wait();
+      }
+    }
+  }
+
+  internal interface ISmsUpdater
+  {
+    void MarkAsRead(int index);
+  }
+}

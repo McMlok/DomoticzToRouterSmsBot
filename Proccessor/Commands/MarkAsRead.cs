@@ -1,4 +1,5 @@
-﻿using DomoticzToRouterSmsBot.Loader;
+﻿using DomoticzToRouterSmsBot.Adapters;
+using DomoticzToRouterSmsBot.Loader;
 using Microsoft.Extensions.Logging;
 
 namespace DomoticzToRouterSmsBot.Proccessor.Commands
@@ -6,16 +7,18 @@ namespace DomoticzToRouterSmsBot.Proccessor.Commands
     internal class MarkAsRead : Command
     {
       private readonly ILogger<MarkAsRead> _logger;
+      private readonly ISmsUpdater _smsUpdater;
 
-      public MarkAsRead(ILogger<MarkAsRead> logger)
+      public MarkAsRead(ILogger<MarkAsRead> logger, ISmsUpdater smsUpdater)
       {
         _logger = logger;
+        _smsUpdater = smsUpdater;
       }
 
       public override void MiddlewareHandler(object sender, Sms e)
       {
         _logger.LogInformation($"SMS {e.Index} marked as read");
-        //TODO: Set sms as read on TP-LINK
+        _smsUpdater.MarkAsRead(e.Index);
       }
     }
 }
