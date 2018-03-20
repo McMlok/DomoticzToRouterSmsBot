@@ -19,7 +19,7 @@ namespace DomoticzToRouterSmsBot
       //setup our DI
       var serviceProvider = new ServiceCollection()
         .AddLogging(c=>c.AddConsole())
-        .AddScoped<ISmsLoader, File>()
+        .AddScoped<ISmsLoader, TpLinkRouter>()
         .AddScoped<ISmsParser, SmsParser>()
         .AddScoped<ISmsRunner, SmsRunner>()
         .AddScoped<IDomoticz, Domoticz>()
