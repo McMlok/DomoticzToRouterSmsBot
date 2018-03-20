@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using DomoticzToRouterSmsBot.Loader;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace DomoticzToRouterSmsBot.Adapters
 {
