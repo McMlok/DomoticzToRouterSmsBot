@@ -18,7 +18,7 @@ namespace DomoticzToRouterSmsBot.Adapters
     private readonly string _baseUri;
     private readonly ILogger<TpLinkRouter> _logger;
 
-    private const string LoadSmsRequestData = "";
+    private const string LoadSmsRequestData = "[LTE_SMS_RECVMSGENTRY#0,0,0,0,0,0#0,0,0,0,0,0]0,5\r\nindex\r\nfrom\r\ncontent\r\nreceivedTime\r\nunread";
 
     public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser, ILogger<TpLinkRouter> logger)
     {
