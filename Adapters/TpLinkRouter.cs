@@ -37,9 +37,7 @@ namespace DomoticzToRouterSmsBot.Adapters
         var uri = CreateLoadUri();
         _logger.LogInformation($"Loading data from {uri}");
 
-        var baseAddress = new Uri(_baseUri);
-        using (var handler = new HttpClientHandler() { UseCookies = false })
-        using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+        using (var client = new HttpClient())
         {
           HttpRequestMessage message =
             new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
