@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using DomoticzToRouterSmsBot.Loader;
@@ -30,21 +31,24 @@ namespace DomoticzToRouterSmsBot.Adapters
 
     public ICollection<Sms> Load()
     {
-      using (var client = new HttpClient())
-      {
         //ADD BASIC AUTH
         var authByteArray = Encoding.ASCII.GetBytes($"{_password}");
         var authString = Convert.ToBase64String(authByteArray);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
         var uri = CreateLoadUri();
         _logger.LogInformation($"Loading data from {uri}");
-        HttpRequestMessage message =
-          new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
-        var result = client.SendAsync(message).GetAwaiter().GetResult();
-        var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-        _logger.LogInformation(content);
-        return _parser.Parse(content);
-      }
+
+        var baseAddress = new Uri(_baseUri);
+        var cookieContainer = new CookieContainer();
+        using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+        using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+        {
+          cookieContainer.Add(baseAddress, new Cookie("Authorization", $"Basic {authString}"));
+          var result = client.PostAsync("/cgi?5", new StringContent(LoadSmsRequestData)).GetAwaiter().GetResult();
+          result.EnsureSuccessStatusCode();
+          var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+          _logger.LogInformation(content);
+          return _parser.Parse(content);
+        }
     }
 
     private string CreateLoadUri()
