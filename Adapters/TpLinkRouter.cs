@@ -40,8 +40,10 @@ namespace DomoticzToRouterSmsBot.Adapters
         _logger.LogInformation($"Loading data from {uri}");
         HttpRequestMessage message =
           new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
-        var result = client.SendAsync(message).Result;
-        return _parser.Parse(result.Content.ReadAsStringAsync().Result);
+        var result = client.SendAsync(message).GetAwaiter().GetResult();
+        var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        _logger.LogDebug(content);
+        return _parser.Parse(content);
       }
     }
 
