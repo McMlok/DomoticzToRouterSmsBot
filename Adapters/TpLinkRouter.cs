@@ -38,15 +38,15 @@ namespace DomoticzToRouterSmsBot.Adapters
         _logger.LogInformation($"Loading data from {uri}");
 
         var baseAddress = new Uri(_baseUri);
-        var cookieContainer = new CookieContainer();
-        using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+        using (var handler = new HttpClientHandler() { UseCookies = false })
         using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
         {
-          cookieContainer.Add(baseAddress, new Cookie("Authorization", $"Basic {authString}"));
-          var result = client.PostAsync("/cgi?5", new StringContent(LoadSmsRequestData)).GetAwaiter().GetResult();
+          HttpRequestMessage message =
+            new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
+          message.Headers.Add("Cookie", $"Authorization=Basic {authString}");
+          var result = client.SendAsync(message).GetAwaiter().GetResult();
           result.EnsureSuccessStatusCode();
           var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-          _logger.LogInformation(content);
           return _parser.Parse(content);
         }
     }
