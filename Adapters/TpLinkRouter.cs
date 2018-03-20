@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,15 +14,17 @@ namespace DomoticzToRouterSmsBot.Adapters
     private readonly string _userName;
     private readonly string _password;
     private readonly string _baseUri;
+    private readonly ILogger<TpLinkRouter> _logger;
 
     private const string LoadSmsRequestData = "";
 
-    public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser)
+    public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser, ILogger<TpLinkRouter> logger)
     {
       _parser = parser;
       _userName = configuration["TpLinkUserName"];
       _password = configuration["TpLinkPassword"];
       _baseUri = configuration["TpLinkUri"];
+      _logger = logger;
     }
 
     public ICollection<Sms> Load()
@@ -33,9 +35,9 @@ namespace DomoticzToRouterSmsBot.Adapters
         var authByteArray = Encoding.ASCII.GetBytes($"{_userName}:{_password}");
         var authString = Convert.ToBase64String(authByteArray);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
-
+        var uri = CreateLoadUri();
         HttpRequestMessage message =
-          new HttpRequestMessage(HttpMethod.Post, CreateLoadUri()) {Content = new StringContent(LoadSmsRequestData) };
+          new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
         var result = client.SendAsync(message).Result;
         return _parser.Parse(result.Content.ReadAsStringAsync().Result);
       }
