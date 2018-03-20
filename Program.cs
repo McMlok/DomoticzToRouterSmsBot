@@ -39,9 +39,11 @@ namespace DomoticzToRouterSmsBot
       logger.LogInformation("Starting application");
 
       var sms = serviceProvider.GetService<ISmsLoader>().Load();
+      logger.LogInformation($"SMS to process {sms?.Count()}");
       var runner = serviceProvider.GetService<ISmsRunner>();
       foreach (var smsToProccess in sms.Where(s => s.Unread).OrderBy(s => s.Index))
       {
+        logger.LogInformation($"Proccessing sms with id {smsToProccess.Index}");
         runner.Run(smsToProccess);
       }
       logger.LogInformation("All done!");
