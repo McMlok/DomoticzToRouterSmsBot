@@ -42,7 +42,7 @@ namespace DomoticzToRouterSmsBot.Adapters
           new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
         var result = client.SendAsync(message).GetAwaiter().GetResult();
         var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-        _logger.LogDebug(content);
+        _logger.LogInformation(content);
         return _parser.Parse(content);
       }
     }
