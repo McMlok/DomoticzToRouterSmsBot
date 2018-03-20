@@ -37,7 +37,7 @@ namespace DomoticzToRouterSmsBot.Adapters
         var authString = Convert.ToBase64String(authByteArray);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
         var uri = CreateLoadUri();
-        _logger.LogInformation($"Loading data from {uri}")
+        _logger.LogInformation($"Loading data from {uri}");
         HttpRequestMessage message =
           new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
         var result = client.SendAsync(message).Result;
