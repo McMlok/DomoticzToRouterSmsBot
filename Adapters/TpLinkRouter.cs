@@ -33,7 +33,7 @@ namespace DomoticzToRouterSmsBot.Adapters
       using (var client = new HttpClient())
       {
         //ADD BASIC AUTH
-        var authByteArray = Encoding.ASCII.GetBytes($"{_userName}:{_password}");
+        var authByteArray = Encoding.ASCII.GetBytes($"{_password}");
         var authString = Convert.ToBase64String(authByteArray);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
         var uri = CreateLoadUri();
@@ -57,7 +57,7 @@ namespace DomoticzToRouterSmsBot.Adapters
       using (var client = new HttpClient())
       {
         //ADD BASIC AUTH
-        var authByteArray = Encoding.ASCII.GetBytes($"{_userName}:{_password}");
+        var authByteArray = Encoding.ASCII.GetBytes($"{_password}");
         var authString = Convert.ToBase64String(authByteArray);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
 
