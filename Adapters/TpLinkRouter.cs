@@ -23,7 +23,6 @@ namespace DomoticzToRouterSmsBot.Adapters
     public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser, ILogger<TpLinkRouter> logger)
     {
       _parser = parser;
-      _userName = configuration["TpLinkUserName"];
       _password = configuration["TpLinkPassword"];
       _baseUri = configuration["TpLinkUri"];
       _logger = logger;
@@ -32,8 +31,6 @@ namespace DomoticzToRouterSmsBot.Adapters
     public ICollection<Sms> Load()
     {
         //ADD BASIC AUTH
-        var authByteArray = Encoding.ASCII.GetBytes($"{_password}");
-        var authString = Convert.ToBase64String(authByteArray);
         var uri = CreateLoadUri();
         _logger.LogInformation($"Loading data from {uri}");
 
@@ -41,7 +38,8 @@ namespace DomoticzToRouterSmsBot.Adapters
         {
           HttpRequestMessage message =
             new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(LoadSmsRequestData) };
-          message.Headers.Add("Cookie", $"Authorization=Basic {authString}");
+          message.Headers.Add("Cookie", $"Authorization=Basic {_password}");
+          message.Headers.Add("Referer", _baseUri);
           var result = client.SendAsync(message).GetAwaiter().GetResult();
           result.EnsureSuccessStatusCode();
           var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
