@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -17,11 +18,11 @@ namespace DomoticzToRouterSmsBot.Loader
         _configuration = configuration;
       }
 
-      public ICollection<Sms> Load()
+      public async Task<ICollection<Sms>> Load()
       {
         var fileName = _configuration["DataFilePath"];
         _logger.LogInformation($"loading data from file {fileName}");
-        var data = System.IO.File.ReadAllLines(fileName);
+        var data = await System.IO.File.ReadAllLinesAsync(fileName);
         return _parser.Parse(data);
       }
     }

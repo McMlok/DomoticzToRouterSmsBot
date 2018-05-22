@@ -7,6 +7,7 @@ using System.Text;
 using DomoticzToRouterSmsBot.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace DomoticzToRouterSmsBot.Adapters
 {
@@ -28,17 +29,17 @@ namespace DomoticzToRouterSmsBot.Adapters
       _logger = logger;
     }
 
-    public ICollection<Sms> Load()
+    public async Task<ICollection<Sms>> Load()
     {
       using (var client = new HttpClient())
       {
-        GetDataFromRouter(client, CreatePagesUri(), GetSmsPageRequestData);
-        var result = GetDataFromRouter(client, CreateLoadUri(), LoadSmsRequestData);
+        await GetDataFromRouter(client, CreatePagesUri(), GetSmsPageRequestData);
+        var result =  await GetDataFromRouter(client, CreateLoadUri(), LoadSmsRequestData);
         return _parser.Parse(result);
       }
     }
 
-    private string GetDataFromRouter(HttpClient client, string uri, string data)
+    private async Task<string> GetDataFromRouter(HttpClient client, string uri, string data)
     {
       _logger.LogInformation($"Loading data from {uri}");
       
@@ -46,14 +47,14 @@ namespace DomoticzToRouterSmsBot.Adapters
         new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(data) };
       message.Headers.Add("Cookie", $"Authorization=Basic {_password}");
       message.Headers.Add("Referer", _baseUri);
-      var result = client.SendAsync(message).GetAwaiter().GetResult();
+      var result = await client.SendAsync(message);
       result.EnsureSuccessStatusCode();
-      var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+      var content = await result.Content.ReadAsStringAsync();
       _logger.LogInformation($"Request result: {content}");
       return content;
     }
 
-        private string CreateLoadUri()
+    private string CreateLoadUri()
     {
       return $"{_baseUri}cgi?5";
     }
@@ -63,7 +64,7 @@ namespace DomoticzToRouterSmsBot.Adapters
       return $"{_baseUri}cgi?2";
     }
 
-    public void MarkAsRead(int index)
+    public async Task MarkAsRead(int index)
     {
       using (var client = new HttpClient())
       {
@@ -75,13 +76,13 @@ namespace DomoticzToRouterSmsBot.Adapters
         HttpRequestMessage message =
           new HttpRequestMessage(HttpMethod.Post, CreateLoadUri()) { Content = new StringContent(LoadSmsRequestData) };
         //TODO: set correct data for mark as read
-        client.SendAsync(message).Wait();
+        await client.SendAsync(message);
       }
     }
   }
 
   internal interface ISmsUpdater
   {
-    void MarkAsRead(int index);
+    Task MarkAsRead(int index);
   }
 }

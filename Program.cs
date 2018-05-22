@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using DomoticzToRouterSmsBot.Adapters;
 using DomoticzToRouterSmsBot.Loader;
 using DomoticzToRouterSmsBot.Proccessor;
@@ -15,7 +16,7 @@ namespace DomoticzToRouterSmsBot
 {
   internal class Program
   {
-    private static void Main()
+    public static async Task Main(string[] args)
     {
       var configuration = new ConfigurationBuilder()
         .AddEnvironmentVariables()
@@ -48,7 +49,7 @@ namespace DomoticzToRouterSmsBot
       var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
       logger.LogInformation("Starting application");
 
-      var sms = serviceProvider.GetService<ISmsLoader>().Load();
+      var sms = await serviceProvider.GetService<ISmsLoader>().Load();
       logger.LogInformation($"SMS to process {sms?.Count()}");
       var runner = serviceProvider.GetService<ISmsRunner>();
       foreach (var smsToProccess in sms.Where(s => s.Unread).OrderBy(s => s.Index))

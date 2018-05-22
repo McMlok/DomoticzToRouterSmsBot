@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DomoticzToRouterSmsBot.Loader
 {
   internal interface ISmsLoader
   {
-    ICollection<Sms> Load();
+    Task<ICollection<Sms>> Load();
   }
 }
