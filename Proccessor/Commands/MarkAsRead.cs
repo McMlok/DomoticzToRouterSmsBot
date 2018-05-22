@@ -1,24 +1,28 @@
 ﻿using DomoticzToRouterSmsBot.Adapters;
 using DomoticzToRouterSmsBot.Loader;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace DomoticzToRouterSmsBot.Proccessor.Commands
 {
     internal class MarkAsRead : Command
     {
       private readonly ILogger<MarkAsRead> _logger;
-      private readonly ISmsUpdater _smsUpdater;
+      private readonly IConfigurationRoot _configuration;
 
-      public MarkAsRead(ILogger<MarkAsRead> logger, ISmsUpdater smsUpdater)
+      public MarkAsRead(ILogger<MarkAsRead> logger, IConfigurationRoot configuration)
       {
         _logger = logger;
-        _smsUpdater = smsUpdater;
+        _configuration = configuration;
       }
 
       public override void MiddlewareHandler(object sender, Sms e)
       {
         _logger.LogInformation($"SMS {e.Index} marked as read");
-        _smsUpdater.MarkAsRead(e.Index);
+        string json = JsonConvert.SerializeObject(new Proccessed{LastProccessedTime = e.RecievedTime}, Formatting.Indented);
+        System.IO.File.WriteAllText(@"lastProccessedSMS.json", json);
       }
     }
 }

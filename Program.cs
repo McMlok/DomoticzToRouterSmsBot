@@ -19,8 +19,8 @@ namespace DomoticzToRouterSmsBot
     public static async Task Main(string[] args)
     {
       var configuration = new ConfigurationBuilder()
-        .AddEnvironmentVariables()
-        .AddJsonFile("appsettings.json", optional:true, reloadOnChange:true)
+        .AddJsonFile("appsettings.json", optional:false, reloadOnChange:true)
+        .AddJsonFile("lastProccessedSMS.json", optional:true, reloadOnChange:true)
         .Build();
       //setup our DI
       var serviceCollection = new ServiceCollection()
@@ -53,7 +53,11 @@ namespace DomoticzToRouterSmsBot
       var sms = await serviceProvider.GetService<ISmsLoader>().Load();
       logger.LogInformation($"SMS to process {sms?.Count()}");
       var runner = serviceProvider.GetService<ISmsRunner>();
-      foreach (var smsToProccess in sms.Where(s => s.Unread).OrderBy(s => s.Index))
+      DateTime lastProccessedTime = DateTime.MinValue;
+      if(!String.IsNullOrEmpty(configuration["LastProccessedTime"])){
+        lastProccessedTime = Convert.ToDateTime(configuration["LastProccessedTime"]);
+      }
+      foreach (var smsToProccess in sms.Where(s => s.RecievedTime > lastProccessedTime).OrderBy(s => s.Index))
       {
         logger.LogInformation($"Proccessing sms with id {smsToProccess.Index}");
         runner.Run(smsToProccess);
@@ -61,5 +65,9 @@ namespace DomoticzToRouterSmsBot
       logger.LogInformation("All done!");
       serviceProvider?.Dispose();
     }
+  }
+
+  public class Proccessed{
+    public DateTime LastProccessedTime { get; set; }
   }
 }
