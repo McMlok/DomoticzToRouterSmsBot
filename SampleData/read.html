@@ -1,0 +1,282 @@
+<script language="javascript" type="text/javascript">
+    var optPageGlobal = $.mainParam[0];
+    var pageNumGlobal = $.mainParam[1];
+    var indexGlobal   = $.mainParam[2];
+    var smsBoxPageList = $.mainParam[3];
+    var paramForEditMsgPage;
+    var param;
+    var originalLastBtnState = 0;
+    var originalNextBtnState = 0;
+    var smsBoxObj;
+    var amountPerPageGlobal = 8;
+    var totalPagesGlobal = 1;
+
+function reformatAndShowMsgCont(contString) {
+    var appendCont = "";
+    for (var i = 0; i < contString.length; i++) 
+    {          
+        if (contString.charAt(i) == '\n') {
+            appendCont += "<br/>";
+        } else if (contString.charAt(i) == '\r' && (i < contString.length - 1) && contString.charAt(i + 1) == '\n') {
+            appendCont += "<br/>";
+            i++;
+        } else {
+            appendCont += contString[i];
+        }
+    }
+    $("#msgContent").append($.htmlEncode(appendCont));
+}
+
+function init() {
+    if (optPageGlobal == 0) {
+        $("#t_et").text("Inbox");
+        smsBoxObj = $.act(ACT_GET, LTE_SMS_RECVMSGBOX, null, null, ["totalNumber", "amountPerPage"]);
+        if (!$.exe()) {
+            totalPagesGlobal = Math.ceil(smsBoxObj.totalNumber / amountPerPageGlobal);
+        } else {
+            return false;
+        }
+        $.act(ACT_SET, LTE_SMS_RECVMSGENTRY, smsBoxPageList[indexGlobal].__stack, null, ["unread=0"]);
+        if ($.exe()) {
+            return false;
+        }
+
+        $("#phoneNumber").text(smsBoxPageList[indexGlobal].from);
+        $("#recvTime").text(smsBoxPageList[indexGlobal].receivedTime);
+        reformatAndShowMsgCont(smsBoxPageList[indexGlobal].content);    
+    } else if (optPageGlobal ==1) {
+        $("#t_et").text("Outbox");
+        $("#reply").parents("div").first().remove();
+        smsBoxObj = $.act(ACT_GET, LTE_SMS_SENDMSGBOX, null, null, ["totalNumber", "amountPerPage"]);
+        if (!$.exe()) {
+            totalPagesGlobal = Math.ceil(smsBoxObj.totalNumber / amountPerPageGlobal);
+        } else {
+            return false;
+        }
+
+        $("#phoneNumber").text(smsBoxPageList[indexGlobal].to);
+        $("#recvTime").text(smsBoxPageList[indexGlobal].sendTime);
+        reformatAndShowMsgCont(smsBoxPageList[indexGlobal].content);
+    }
+}
+</script>
+
+<h3 id="t_et">Read Message</h3>
+<div class="content-container">
+    <form class="pure-form pure-form-aligned">
+        <div class="table-op-lte">
+            <div class="table-btn">
+                <div class="inline" style="padding-right:20px;" id="divLastBtn">
+                    <span class="last-icon-green-lte table-icon-lte" id="msgLast"></span>
+                    <label class="table-icon-text-green-lte" id="t_labelLast">Last</label>
+                </div>
+                <div class="inline" id="divNextBtn">
+                    <span class="next-icon-green-lte table-icon-lte" id="msgNext"></span>
+                    <label class="table-icon-text-green-lte" id="t_labelNext">Next</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="pure-control-group">
+            <div class="read-msg-div-wrap">
+                <div class="read-msg-left-top-wrap inline" style="text-align:left;">
+                    <label class="label-title s" id="t_from" style="width:50px;">From:</label>
+                    <label class="label-title m" id="phoneNumber" style="font-weight:bold;"></label>
+                </div>
+                <div class="read-msg-left-top-wrap inline" style="text-align:right;">
+                    <label class="label-title l" id="recvTime" style="text-align:right;"></label>
+                </div>
+                <div class="read-msg-content-wrap">
+                    <div>
+                        <p class="cfg-line" id="msgContent" style="word-break:break-all;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="inline-btn-right part-separate">
+            <div class="inline">
+                <button type="submit" class="green T_back" id="back">Back</button>
+            </div>
+            <div class="inline">
+                <button type="submit" class="green T_reply" id="reply">Reply</button>
+            </div>
+            <div class="inline">
+                <button type="submit" class="green T_forward" id="forward">Forward</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script language="javascript" type="text/javascript">
+$("#divLastBtn").mouseover(function() {
+    if ($("#msgLast").hasClass("last-icon-green-lte")) {
+        originalLastBtnState = 1;
+    } else {
+        originalLastBtnState = 0;
+    }
+
+    $("#msgLast").removeClass("last-icon-green-lte");
+    $("#msgLast").addClass("last-icon-grey-lte");
+    $("#t_labelLast").removeClass("table-icon-text-green-lte");
+    $("#t_labelLast").addClass("table-icon-text-grey-lte");
+} );
+$("#divLastBtn").mouseout(function() {
+    if (originalLastBtnState == 1) {
+        $("#msgLast").removeClass("last-icon-grey-lte");
+        $("#msgLast").addClass("last-icon-green-lte");
+        $("#t_labelLast").removeClass("table-icon-text-grey-lte");
+        $("#t_labelLast").addClass("table-icon-text-green-lte");        
+    } else {
+        $("#msgLast").removeClass("last-icon-green-lte");
+        $("#msgLast").addClass("last-icon-grey-lte");
+        $("#t_labelLast").removeClass("table-icon-text-green-lte");
+        $("#t_labelLast").addClass("table-icon-text-grey-lte");  
+    }
+} );
+$("#divLastBtn").click(function() {
+    if (indexGlobal < 0 || indexGlobal >= amountPerPageGlobal) {
+        return;
+    } else if (indexGlobal == 0) {
+        indexGlobal = amountPerPageGlobal - 1;
+        pageNumGlobal--;
+        if (pageNumGlobal < 1) {
+            indexGlobal = 0;
+            pageNumGlobal++;
+            $("#msgLast").removeClass("last-icon-green-lte");
+            $("#msgLast").addClass("last-icon-grey-lte");
+            $("#t_labelLast").removeClass("table-icon-text-green-lte");
+            $("#t_labelLast").addClass("table-icon-text-grey-lte");
+            originalLastBtnState = 0;
+            return;
+        } else {
+            if (optPageGlobal == 0) {
+                $.act(ACT_SET, LTE_SMS_RECVMSGBOX, null, null, ["PageNumber=" + pageNumGlobal]);
+                smsBoxPageList = $.act(ACT_GL, LTE_SMS_RECVMSGENTRY, null, null, ["index", "from", "content", "receivedTime", "unread"]);
+            } else if (optPageGlobal == 1) {
+                $.act(ACT_SET, LTE_SMS_SENDMSGBOX, null, null, ["PageNumber=" + pageNumGlobal]);
+                smsBoxPageList = $.act(ACT_GL, LTE_SMS_RECVMSGENTRY, null, null, ["index", "to", "content", "sendTime"]);            
+            }
+            if (!$.exe()) {
+                param[0] = optPageGlobal;
+                param[1] = pageNumGlobal;
+                param[2] = indexGlobal;
+                param[3] = smsBoxPageList;
+                $.loadMain("lteSmsReadMsg.htm", param);
+            }
+        }
+    } else {
+        indexGlobal--;
+        param[0] = optPageGlobal;
+        param[1] = pageNumGlobal;
+        param[2] = indexGlobal;
+        param[3] = smsBoxPageList;
+        $.loadMain("lteSmsReadMsg.htm", param);
+    }
+});
+
+$("#divNextBtn").mouseover(function() {
+    if ($("#msgNext").hasClass("next-icon-green-lte")) {
+        originalNextBtnState = 1;
+    } else {
+        originalNextBtnState = 0;
+    }
+    $("#msgNext").removeClass("next-icon-green-lte");
+    $("#msgNext").addClass("next-icon-grey-lte");
+    $("#t_labelNext").removeClass("table-icon-text-green-lte");
+    $("#t_labelNext").addClass("table-icon-text-grey-lte");
+} );
+
+$("#divNextBtn").mouseout(function() {
+    if (originalNextBtnState == 1) {
+        $("#msgNext").removeClass("next-icon-grey-lte");
+        $("#msgNext").addClass("next-icon-green-lte");
+        $("#t_labelNext").removeClass("table-icon-text-grey-lte");
+        $("#t_labelNext").addClass("table-icon-text-green-lte");        
+    } else {
+        $("#msgNext").removeClass("next-icon-green-lte");
+        $("#msgNext").addClass("next-icon-grey-lte");
+        $("#t_labelNext").removeClass("table-icon-text-green-lte");
+        $("#t_labelNext").addClass("table-icon-text-grey-lte");  
+    }
+});
+
+$("#divNextBtn").click(function() {
+    if (indexGlobal < 0 || indexGlobal >= amountPerPageGlobal) {
+        return;
+    } else if (indexGlobal == amountPerPageGlobal - 1)  {
+        indexGlobal = 0;
+        pageNumGlobal++;
+        if (pageNumGlobal > totalPagesGlobal) {
+            indexGlobal = amountPerPageGlobal - 1;
+            pageNumGlobal--;
+            $("#msgNext").removeClass("next-icon-green-lte");
+            $("#msgNext").addClass("next-icon-grey-lte");
+            $("#t_labelNext").removeClass("table-icon-text-green-lte");
+            $("#t_labelNext").addClass("table-icon-text-grey-lte");
+            originalNextBtnState = 0;
+            return;
+        } else {
+            if (optPageGlobal == 0) {
+                $.act(ACT_SET, LTE_SMS_RECVMSGBOX, null, null, ["PageNumber=" + pageNumGlobal]);
+                smsBoxPageList = $.act(ACT_GL, LTE_SMS_RECVMSGENTRY, null, null, ["index", "from", "content", "receivedTime", "unread"]);
+            } else if (optPageGlobal == 1) {
+                $.act(ACT_SET, LTE_SMS_SENDMSGBOX, null, null, ["PageNumber=" + pageNumGlobal]);
+                smsBoxPageList = $.act(ACT_GL, LTE_SMS_RECVMSGENTRY, null, null, ["index", "to", "content", "sendTime"]);            
+            }
+            if (!$.exe()) {
+                param[0] = optPageGlobal;
+                param[1] = pageNumGlobal;
+                param[2] = indexGlobal;
+                param[3] = smsBoxPageList;
+                $.loadMain("lteSmsReadMsg.htm", param);
+            }
+        }
+    } else {
+        var lastPageRowNum = smsBoxObj.totalNumber - (totalPagesGlobal - 1)*amountPerPageGlobal;
+        if ((indexGlobal == lastPageRowNum - 1) && (pageNumGlobal == totalPagesGlobal)) {
+            $("#msgNext").removeClass("next-icon-green-lte");
+            $("#msgNext").addClass("next-icon-grey-lte");
+            $("#t_labelNext").removeClass("table-icon-text-green-lte");
+            $("#t_labelNext").addClass("table-icon-text-grey-lte");
+            originalNextBtnState = 0;
+            return;          
+        } else {
+            indexGlobal++;
+            param[0] = optPageGlobal;
+            param[1] = pageNumGlobal;
+            param[2] = indexGlobal;
+            param[3] = smsBoxPageList;
+            $.loadMain("lteSmsReadMsg.htm", param);
+        }
+    }
+});
+
+$("#back").click(function() {
+    if (optPageGlobal == 0) {
+        $.loadMain("lteSmsInbox.htm");
+    } else if(optPageGlobal == 1) {
+        $.loadMain("lteSmsOutbox.htm");
+    }
+});
+
+$("#reply").click(function() {
+    param[0] = optPageGlobal;
+    param[1] = 0;
+    param[2] = pageNumGlobal;
+    param[3] = indexGlobal;
+    param[4] = smsBoxPageList;
+    $.loadMain("lteSmsNewMsg.htm", param);
+});
+
+$("#forward").click(function() {
+    param[0] = optPageGlobal;
+    param[1] = 1;
+    param[2] = pageNumGlobal;
+    param[3] = indexGlobal;
+    param[4] = smsBoxPageList;
+    $.loadMain("lteSmsNewMsg.htm", param);
+});
+
+$.tpInit(init);
+</script>

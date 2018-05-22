@@ -7,7 +7,7 @@ namespace DomoticzToRouterSmsBot.Loader
   internal class SmsParser : ISmsParser
   {
     private static readonly Regex SmsHeader = new Regex("^\\[(\\d[,]){5}\\d\\]\\d");
-    private static readonly Regex SmsFrom = new Regex("from=(?'value'\\d*)");
+    private static readonly Regex SmsFrom = new Regex("from=(?'value'[+]{0,1}\\d*)");
     private static readonly Regex SmsMessage = new Regex("content=(?'value'.*)");
     private static readonly Regex SmsUnread = new Regex("unread=(?'value'\\d*)");
     private static readonly Regex SmsIndex = new Regex("index=(?'value'\\d*)");

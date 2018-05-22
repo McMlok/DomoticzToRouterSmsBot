@@ -1,7 +1,9 @@
 ﻿using System.Net.Http;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DomoticzToRouterSmsBot.Adapters
 {
@@ -26,26 +28,32 @@ namespace DomoticzToRouterSmsBot.Adapters
 
       using (var client = new HttpClient())
       {
-        string uri = GetCommandUri($"param=switchlight&idx={idx.Value}&switchcmd={state}");
-        client.GetAsync(uri).Wait();
+        string uri = GetCommandUri($"type=command&param=switchlight&idx={idx.Value}&switchcmd={state}");
+        var result = client.GetAsync(uri).GetAwaiter().GetResult();
+        var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        _logger.LogInformation($"Swith {idx.Value} to state {state} result with {content}");
       }
     }
 
     private string GetCommandUri(string command)
     {
-      return $"{_domoticzUri}/json/html?{command}";
+      return $"{_domoticzUri}/json.htm?{command}";
     }
 
     private int? GetIdByName(string name)
     {
       using (var client = new HttpClient())
       {
-        string uri = GetCommandUri($"type=devices&name={name}");
-        var result = client.GetAsync(uri).Result;
-        dynamic json = JsonConvert.DeserializeObject(result.Content.ReadAsStringAsync().Result);
-        if (int.TryParse(json["result"][0]["idx"]?.ToString(), out int idx))
-        {
-          return idx;
+        string uri = GetCommandUri($"type=devices&filter=light");
+        _logger.LogInformation($"Loading data from {uri}");
+        var result = client.GetAsync(uri).GetAwaiter().GetResult();
+        var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        dynamic json = JsonConvert.DeserializeObject(content);
+        foreach(var device in json["result"]){
+            var idx = 0;
+            if(device["Name"] == name && int.TryParse(device["idx"]?.ToString(), out idx)){
+                return idx;
+            }
         }
         return null;
       }
