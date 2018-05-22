@@ -27,7 +27,6 @@ namespace DomoticzToRouterSmsBot
         .AddLogging(c=>c.AddConsole())
         .AddScoped<ISmsParser, SmsParser>()
         .AddScoped<ISmsRunner, SmsRunner>()
-        .AddScoped<IDomoticz, Domoticz>()
         .AddScoped<ISmsUpdater, TpLinkRouter>()
         .AddScoped<ToggleSwitch>()
         .AddScoped<MarkAsRead>()
@@ -39,9 +38,11 @@ namespace DomoticzToRouterSmsBot
         })
         .AddSingleton(provider => configuration);
         if(String.IsNullOrEmpty(configuration["DataFilePath"])){
+          serviceCollection.AddScoped<IDomoticz, Domoticz>();
           serviceCollection.AddScoped<ISmsLoader, TpLinkRouter>();  
         }
         else{
+          serviceCollection.AddScoped<IDomoticz, FakeDomoticz>();
           serviceCollection.AddScoped<ISmsLoader, File>();  
         }
         var serviceProvider = serviceCollection.BuildServiceProvider();

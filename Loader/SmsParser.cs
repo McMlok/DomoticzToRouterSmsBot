@@ -12,6 +12,8 @@ namespace DomoticzToRouterSmsBot.Loader
     private static readonly Regex SmsUnread = new Regex("unread=(?'value'\\d*)");
     private static readonly Regex SmsIndex = new Regex("index=(?'value'\\d*)");
 
+    private static readonly Regex SmsRecievedTime = new Regex("receivedTime=(?'value'[0-9 -:]*)");
+
     public ICollection<Sms> Parse(string[] data)
     {
       var sms = new List<Sms>();
@@ -35,6 +37,8 @@ namespace DomoticzToRouterSmsBot.Loader
           newSms.Unread = unread == "1";
         if(TryGetValue(SmsIndex, line, out string index))
           newSms.Index = Convert.ToInt32(index);
+        if(TryGetValue(SmsRecievedTime, line, out string receivedTime))
+          newSms.RecievedTime = Convert.ToDateTime(receivedTime);
       }
       if (newSms != null)
         sms.Add(newSms);

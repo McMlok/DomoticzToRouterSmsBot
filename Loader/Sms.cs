@@ -1,4 +1,6 @@
-﻿namespace DomoticzToRouterSmsBot.Loader
+﻿using System;
+
+namespace DomoticzToRouterSmsBot.Loader
 {
   internal class Sms
   {
@@ -8,5 +10,7 @@
 
     public string Message { get; set; }
     public bool Unread { get; set; }
+
+    public DateTime RecievedTime {get;set;}
   }
 }
