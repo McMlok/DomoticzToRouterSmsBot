@@ -1,7 +1,9 @@
-﻿namespace DomoticzToRouterSmsBot.Adapters
+﻿using System.Threading.Tasks;
+
+namespace DomoticzToRouterSmsBot.Adapters
 {
   internal interface IDomoticz
   {
-    void ToggleSwitch(string name, SwitchState state);
+    Task ToggleSwitch(string name, SwitchState state);
   }
 }

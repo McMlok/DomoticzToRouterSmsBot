@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -19,9 +20,9 @@ namespace DomoticzToRouterSmsBot.Adapters
       _domoticzUri = options["DomoticzUri"];
     }
 
-    public void ToggleSwitch(string name, SwitchState state)
+    public async Task ToggleSwitch(string name, SwitchState state)
     {
-      var idx = GetIdByName(name);
+      var idx = await GetIdByName(name);
       if (!idx.HasValue)
       {
         _logger.LogError($"Device with name {name} not found");
@@ -29,8 +30,8 @@ namespace DomoticzToRouterSmsBot.Adapters
       }
 
       string uri = GetCommandUri($"type=command&param=switchlight&idx={idx.Value}&switchcmd={state}");
-      var result = _httpClient.GetAsync(uri).GetAwaiter().GetResult();
-      var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+      var result = await _httpClient.GetAsync(uri);
+      var content = await result.Content.ReadAsStringAsync();
       _logger.LogInformation($"Swith {idx.Value} to state {state} result with {content}");
     }
 
@@ -39,12 +40,12 @@ namespace DomoticzToRouterSmsBot.Adapters
       return $"{_domoticzUri}/json.htm?{command}";
     }
 
-    private int? GetIdByName(string name)
+    private async Task<int?> GetIdByName(string name)
     {
       string uri = GetCommandUri($"type=devices&filter=light");
       _logger.LogInformation($"Loading data from {uri}");
-      var result = _httpClient.GetAsync(uri).GetAwaiter().GetResult();
-      var content = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+      var result = await _httpClient.GetAsync(uri);
+      var content = await result.Content.ReadAsStringAsync();
       dynamic json = JsonConvert.DeserializeObject(content);
       foreach(var device in json["result"]){
           var idx = 0;
