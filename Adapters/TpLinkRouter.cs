@@ -18,25 +18,25 @@ namespace DomoticzToRouterSmsBot.Adapters
     private readonly string _baseUri;
     private readonly ILogger<TpLinkRouter> _logger;
 
+    private readonly HttpClient _httpClient;
+
     private const string LoadSmsRequestData = "[LTE_SMS_RECVMSGENTRY#0,0,0,0,0,0#0,0,0,0,0,0]0,5\r\nindex\r\nfrom\r\ncontent\r\nreceivedTime\r\nunread\r\n";
     private const string GetSmsPageRequestData = "[LTE_SMS_RECVMSGBOX#0,0,0,0,0,0#0,0,0,0,0,0]0,1\r\nPageNumber=1\r\n";
 
-    public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser, ILogger<TpLinkRouter> logger)
+    public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser, ILogger<TpLinkRouter> logger, HttpClient httpClient)
     {
       _parser = parser;
       _password = configuration["TpLinkPassword"];
       _baseUri = configuration["TpLinkUri"];
       _logger = logger;
+      _httpClient = httpClient;
     }
 
     public async Task<ICollection<Sms>> Load()
     {
-      using (var client = new HttpClient())
-      {
-        await GetDataFromRouter(client, CreatePagesUri(), GetSmsPageRequestData);
-        var result =  await GetDataFromRouter(client, CreateLoadUri(), LoadSmsRequestData);
-        return _parser.Parse(result);
-      }
+      await GetDataFromRouter(_httpClient, CreatePagesUri(), GetSmsPageRequestData);
+      var result =  await GetDataFromRouter(_httpClient, CreateLoadUri(), LoadSmsRequestData);
+      return _parser.Parse(result);
     }
 
     private async Task<string> GetDataFromRouter(HttpClient client, string uri, string data)
@@ -66,18 +66,12 @@ namespace DomoticzToRouterSmsBot.Adapters
 
     public async Task MarkAsRead(int index)
     {
-      using (var client = new HttpClient())
-      {
-        //ADD BASIC AUTH
-        var authByteArray = Encoding.ASCII.GetBytes($"{_password}");
-        var authString = Convert.ToBase64String(authByteArray);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
-
-        HttpRequestMessage message =
-          new HttpRequestMessage(HttpMethod.Post, CreateLoadUri()) { Content = new StringContent(LoadSmsRequestData) };
-        //TODO: set correct data for mark as read
-        await client.SendAsync(message);
-      }
+      HttpRequestMessage message =
+        new HttpRequestMessage(HttpMethod.Post, CreateLoadUri()) { Content = new StringContent(LoadSmsRequestData) };
+      message.Headers.Add("Cookie", $"Authorization=Basic {_password}");
+      message.Headers.Add("Referer", _baseUri);
+      //TODO: set correct data for mark as read
+      await _httpClient.SendAsync(message);
     }
   }
 

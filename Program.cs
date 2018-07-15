@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
 using DomoticzToRouterSmsBot.Adapters;
 using DomoticzToRouterSmsBot.Loader;
 using DomoticzToRouterSmsBot.Proccessor;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Polly;
 
 namespace DomoticzToRouterSmsBot
 {
@@ -40,6 +42,8 @@ namespace DomoticzToRouterSmsBot
         if(String.IsNullOrEmpty(configuration["DataFilePath"])){
           serviceCollection.AddScoped<IDomoticz, Domoticz>();
           serviceCollection.AddScoped<ISmsLoader, TpLinkRouter>();  
+          serviceCollection.AddHttpClient<TpLinkRouter>().AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(3));
+          serviceCollection.AddHttpClient<Domoticz>().AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(3));
         }
         else{
           serviceCollection.AddScoped<IDomoticz, FakeDomoticz>();
