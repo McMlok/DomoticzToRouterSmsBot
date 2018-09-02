@@ -23,13 +23,13 @@ namespace DomoticzToRouterSmsBot.Adapters
     private const string LoadSmsRequestData = "[LTE_SMS_RECVMSGENTRY#0,0,0,0,0,0#0,0,0,0,0,0]0,5\r\nindex\r\nfrom\r\ncontent\r\nreceivedTime\r\nunread\r\n";
     private const string GetSmsPageRequestData = "[LTE_SMS_RECVMSGBOX#0,0,0,0,0,0#0,0,0,0,0,0]0,1\r\nPageNumber=1\r\n";
 
-    public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser, ILogger<TpLinkRouter> logger, HttpClient httpClient)
+    public TpLinkRouter(IConfigurationRoot configuration, ISmsParser parser, ILogger<TpLinkRouter> logger, IHttpClientFactory httpClientFactory)
     {
       _parser = parser;
       _password = configuration["TpLinkPassword"];
       _baseUri = configuration["TpLinkUri"];
       _logger = logger;
-      _httpClient = httpClient;
+      _httpClient = httpClientFactory.CreateClient("router");
     }
 
     public async Task<ICollection<Sms>> Load()

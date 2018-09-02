@@ -42,8 +42,8 @@ namespace DomoticzToRouterSmsBot
         if(String.IsNullOrEmpty(configuration["DataFilePath"])){
           serviceCollection.AddScoped<IDomoticz, Domoticz>();
           serviceCollection.AddScoped<ISmsLoader, TpLinkRouter>();  
-          serviceCollection.AddHttpClient<TpLinkRouter>().AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(3));
-          serviceCollection.AddHttpClient<Domoticz>().AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(3));
+          serviceCollection.AddHttpClient("router").AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(3));
+          serviceCollection.AddHttpClient("domoticz").AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(3));
         }
         else{
           serviceCollection.AddScoped<IDomoticz, FakeDomoticz>();

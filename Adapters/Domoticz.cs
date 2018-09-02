@@ -13,10 +13,10 @@ namespace DomoticzToRouterSmsBot.Adapters
     private readonly ILogger<Domoticz> _logger;
     private readonly HttpClient _httpClient;
     private readonly string _domoticzUri;
-    public Domoticz(IConfigurationRoot options, ILogger<Domoticz> logger, HttpClient httpClient)
+    public Domoticz(IConfigurationRoot options, ILogger<Domoticz> logger, IHttpClientFactory httpClientFactory)
     {
       _logger = logger;
-      _httpClient = httpClient;
+      _httpClient = httpClientFactory.CreateClient("domoticz");
       _domoticzUri = options["DomoticzUri"];
     }
 
