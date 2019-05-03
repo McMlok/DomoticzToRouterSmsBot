@@ -22,7 +22,7 @@ namespace DomoticzToRouterSmsBot.Proccessor.Commands
       {
         _logger.LogInformation($"SMS {e.Index} marked as read");
         string json = JsonConvert.SerializeObject(new Proccessed{LastProccessedTime = e.RecievedTime}, Formatting.Indented);
-        System.IO.File.WriteAllText(@"lastProccessedSMS.json", json);
+        System.IO.File.WriteAllText(_configuration["lastProcessedFileName"], json);
       }
     }
 }

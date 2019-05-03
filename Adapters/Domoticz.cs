@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace DomoticzToRouterSmsBot.Adapters
 {
@@ -46,12 +47,10 @@ namespace DomoticzToRouterSmsBot.Adapters
       _logger.LogInformation($"Loading data from {uri}");
       var result = await _httpClient.GetAsync(uri);
       var content = await result.Content.ReadAsStringAsync();
-      dynamic json = JsonConvert.DeserializeObject(content);
-      foreach(var device in json["result"]){
-          var idx = 0;
-          if(device["Name"] == name && int.TryParse(device["idx"]?.ToString(), out idx)){
-              return idx;
-          }
+      JObject json = JObject.Parse(content);
+      JToken idx = json.SelectToken($"$.result[?(@.Name == '{name}')].idx");
+      if(idx != null){
+        return int.Parse(idx.ToString());
       }
       return null;
     }

@@ -77,7 +77,8 @@ namespace DomoticzToRouterSmsBot
             }
             else
             {
-                services.AddScoped<IDomoticz, FakeDomoticz>();
+                services.AddScoped<IDomoticz, Domoticz>(); 
+                services.AddHttpClient("domoticz").AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(3));
                 services.AddScoped<ISmsLoader, File>();
             }
             var serviceProvider = services.BuildServiceProvider();
