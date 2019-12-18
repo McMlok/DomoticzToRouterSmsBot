@@ -14,19 +14,21 @@ internal class WorkerService : IHostedService
     private readonly ISmsLoader _loader;
     private readonly ISmsRunner _runner;
     private readonly IConfiguration _configuration;
+    private readonly IHostApplicationLifetime _lifeTime;
 
-    public WorkerService(ILogger<WorkerService> logger, ISmsLoader loader, ISmsRunner runner, IConfiguration configuration){
+    public WorkerService(ILogger<WorkerService> logger, ISmsLoader loader, ISmsRunner runner, IConfiguration configuration, IHostApplicationLifetime lifeTime){
         _logger = logger;
         _loader = loader;
         _runner = runner;
         _configuration = configuration;
+        _lifeTime = lifeTime;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting application");
 
-        var sms = await _loader.Load();
+        var sms = await _loader.LoadAsync();
         _logger.LogInformation($"SMS to process {sms?.Count()}");
         DateTime lastProccessedTime = DateTime.MinValue;
         if (!String.IsNullOrEmpty(_configuration["LastProccessedTime"]))
@@ -36,12 +38,17 @@ internal class WorkerService : IHostedService
         _logger.LogInformation($"Last proccessed time {lastProccessedTime}");
         foreach (var smsToProccess in sms.Where(s => s.RecievedTime > lastProccessedTime).OrderBy(s => s.Index))
         {
+            if(cancellationToken.IsCancellationRequested)
+                return;
             _logger.LogInformation($"Proccessing sms with id {smsToProccess.Index}");
-            _runner.Run(smsToProccess);
+            await _runner.RunAsync(smsToProccess);
         }
         _logger.LogInformation("All done!");
+        _lifeTime.StopApplication();
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {}
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }

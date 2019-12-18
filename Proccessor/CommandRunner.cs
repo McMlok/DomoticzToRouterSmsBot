@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DomoticzToRouterSmsBot.Loader;
 using DomoticzToRouterSmsBot.Proccessor.Commands;
 using Microsoft.Extensions.Configuration;
@@ -23,7 +24,7 @@ namespace DomoticzToRouterSmsBot.Proccessor
       
     }
 
-    public void Run(Sms sms)
+    public async Task RunAsync(Sms sms)
     {
       if (!_allowedNumbers.Contains(sms.From))
       {
@@ -32,7 +33,7 @@ namespace DomoticzToRouterSmsBot.Proccessor
       }
       try
       {
-        _command.Handle(sms);
+        await _command.Handle(sms);
       }
       catch (Exception e)
       {

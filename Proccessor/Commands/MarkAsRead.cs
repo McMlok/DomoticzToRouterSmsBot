@@ -1,9 +1,8 @@
-using DomoticzToRouterSmsBot.Adapters;
 using DomoticzToRouterSmsBot.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.IO;
+using System.Threading.Tasks;
 
 namespace DomoticzToRouterSmsBot.Proccessor.Commands
 {
@@ -18,11 +17,11 @@ namespace DomoticzToRouterSmsBot.Proccessor.Commands
         _configuration = configuration;
       }
 
-      public override void MiddlewareHandler(object sender, Sms e)
+      public override async Task MiddlewareHandler(Sms e)
       {
         _logger.LogInformation($"SMS {e.Index} marked as read");
         string json = JsonConvert.SerializeObject(new Proccessed{LastProccessedTime = e.RecievedTime}, Formatting.Indented);
-        System.IO.File.WriteAllText(_configuration["lastProcessedFileName"], json);
+        await System.IO.File.WriteAllTextAsync(_configuration["lastProcessedFileName"], json);
       }
     }
 }

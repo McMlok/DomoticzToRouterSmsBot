@@ -1,30 +1,31 @@
-﻿using System;
+using System;
+using System.Threading.Tasks;
 using DomoticzToRouterSmsBot.Loader;
 
 namespace DomoticzToRouterSmsBot.Proccessor.Commands
 {
   internal abstract class Command : ICommand
   {
-    private readonly EventHandler<Sms> _eventHandler;
+    private readonly Func<Sms, Task> _eventHandler;
     protected Command Next { get; set; }
 
     protected Command()
     {
-      _eventHandler += MiddlewareHandler;
+      _eventHandler = MiddlewareHandler;
     }
 
-    public void Handle(Sms sms)
+    public async Task Handle(Sms sms)
     {
-      OnInvoke(sms);
+      await OnInvoke(sms);
     }
 
-    public virtual void OnInvoke(Sms e)
+    public virtual async Task OnInvoke(Sms e)
     {
-      _eventHandler?.Invoke(this, e);
-      Next?.MiddlewareHandler(this, e);
+      await _eventHandler?.Invoke(e);
+      await Next?.MiddlewareHandler(e);
     }
 
-    public abstract void MiddlewareHandler(object sender, Sms e);
+    public abstract Task MiddlewareHandler(Sms e);
 
     public Command Use(Command next)
     {

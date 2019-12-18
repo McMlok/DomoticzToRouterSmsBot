@@ -21,7 +21,7 @@ namespace DomoticzToRouterSmsBot.Adapters
       _domoticzUri = options["DomoticzUri"];
     }
 
-    public async Task ToggleSwitch(string name, SwitchState state)
+    public async Task ToggleSwitchAsync(string name, SwitchState state)
     {
       var idx = await GetIdByName(name);
       if (!idx.HasValue)

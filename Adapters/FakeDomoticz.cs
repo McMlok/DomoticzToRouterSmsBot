@@ -10,7 +10,7 @@ namespace DomoticzToRouterSmsBot.Adapters
         {
             _logger = logger;
         }
-        public Task ToggleSwitch(string name, SwitchState state)
+        public Task ToggleSwitchAsync(string name, SwitchState state)
         {
             _logger.LogInformation($"Switching {name} to {state}");
             return Task.CompletedTask;

@@ -1,9 +1,10 @@
-﻿using DomoticzToRouterSmsBot.Loader;
+using System.Threading.Tasks;
+using DomoticzToRouterSmsBot.Loader;
 
 namespace DomoticzToRouterSmsBot.Proccessor
 {
   internal interface ISmsRunner
   {
-    void Run(Sms sms);
+    Task RunAsync(Sms sms);
   }
 }

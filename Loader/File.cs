@@ -18,7 +18,7 @@ namespace DomoticzToRouterSmsBot.Loader
         _configuration = configuration;
       }
 
-      public async Task<ICollection<Sms>> Load()
+      public async Task<ICollection<Sms>> LoadAsync()
       {
         var fileName = _configuration["DataFilePath"];
         _logger.LogInformation($"loading data from file {fileName}");

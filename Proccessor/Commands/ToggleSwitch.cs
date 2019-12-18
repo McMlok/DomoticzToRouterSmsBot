@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using DomoticzToRouterSmsBot.Adapters;
 using DomoticzToRouterSmsBot.Loader;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ namespace DomoticzToRouterSmsBot.Proccessor.Commands
       _domoticzAdapter = domoticzAdapter;
     }
 
-    public override void MiddlewareHandler(object sender, Sms e)
+    public override async Task MiddlewareHandler(Sms e)
     {
       var match = CommandPattern.Match(e.Message);
       if (match.Success)
@@ -31,7 +32,7 @@ namespace DomoticzToRouterSmsBot.Proccessor.Commands
           return;
         }
         _logger.LogInformation($"Switching {switchName} to state {state}");
-        _domoticzAdapter.ToggleSwitch(switchName, (SwitchState)switchState);
+        await _domoticzAdapter.ToggleSwitchAsync(switchName, (SwitchState)switchState);
       }
     }
   }

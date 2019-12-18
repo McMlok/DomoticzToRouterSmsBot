@@ -32,7 +32,7 @@ namespace DomoticzToRouterSmsBot.Adapters
       _httpClient = httpClientFactory.CreateClient("router");
     }
 
-    public async Task<ICollection<Sms>> Load()
+    public async Task<ICollection<Sms>> LoadAsync()
     {
       await GetDataFromRouter(_httpClient, CreatePagesUri(), GetSmsPageRequestData);
       var result =  await GetDataFromRouter(_httpClient, CreateLoadUri(), LoadSmsRequestData);
