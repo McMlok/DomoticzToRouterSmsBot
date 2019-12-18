@@ -1,4 +1,4 @@
-﻿using DomoticzToRouterSmsBot.Adapters;
+using DomoticzToRouterSmsBot.Adapters;
 using DomoticzToRouterSmsBot.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -10,9 +10,9 @@ namespace DomoticzToRouterSmsBot.Proccessor.Commands
     internal class MarkAsRead : Command
     {
       private readonly ILogger<MarkAsRead> _logger;
-      private readonly IConfigurationRoot _configuration;
+      private readonly IConfiguration _configuration;
 
-      public MarkAsRead(ILogger<MarkAsRead> logger, IConfigurationRoot configuration)
+      public MarkAsRead(ILogger<MarkAsRead> logger, IConfiguration configuration)
       {
         _logger = logger;
         _configuration = configuration;

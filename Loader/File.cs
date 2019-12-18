@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -9,9 +9,9 @@ namespace DomoticzToRouterSmsBot.Loader
     {
       private readonly ILogger<File> _logger;
       private readonly ISmsParser _parser;
-      private readonly IConfigurationRoot _configuration;
+      private readonly IConfiguration _configuration;
 
-      public File(ILogger<File> logger, ISmsParser parser, IConfigurationRoot configuration)
+      public File(ILogger<File> logger, ISmsParser parser, IConfiguration configuration)
       {
         _logger = logger;
         _parser = parser;

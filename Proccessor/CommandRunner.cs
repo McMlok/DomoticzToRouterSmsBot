@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DomoticzToRouterSmsBot.Loader;
@@ -13,9 +13,8 @@ namespace DomoticzToRouterSmsBot.Proccessor
     private readonly ILogger<SmsRunner> _logger;
     private readonly ICommand _command;
     private readonly List<string> _allowedNumbers;
-    private readonly ICommand command;
 
-    public SmsRunner(ILogger<SmsRunner> logger, IConfigurationRoot configuration, ICommand command)
+    public SmsRunner(ILogger<SmsRunner> logger, IConfiguration configuration, ICommand command)
     {
       _logger = logger;
       _command = command;

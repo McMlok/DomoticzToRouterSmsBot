@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +14,7 @@ namespace DomoticzToRouterSmsBot.Adapters
     private readonly ILogger<Domoticz> _logger;
     private readonly HttpClient _httpClient;
     private readonly string _domoticzUri;
-    public Domoticz(IConfigurationRoot options, ILogger<Domoticz> logger, IHttpClientFactory httpClientFactory)
+    public Domoticz(IConfiguration options, ILogger<Domoticz> logger, IHttpClientFactory httpClientFactory)
     {
       _logger = logger;
       _httpClient = httpClientFactory.CreateClient("domoticz");
