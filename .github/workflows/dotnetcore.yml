@@ -14,9 +14,9 @@ jobs:
       with:
         dotnet-version: 3.0.101
     - name: Build with dotnet
-      run: dotnet build --configuration Release
+      run: dotnet publish -r linux-arm --configuration Release /p:PublishSingleFile=true
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
         name: Release binaries
-        path: ./bin/release/netcore3.0
+        path: ./bin/release/netcoreapp3.0
