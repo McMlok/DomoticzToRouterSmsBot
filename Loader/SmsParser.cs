@@ -31,6 +31,10 @@ namespace DomoticzToRouterSmsBot.Loader
           continue;
         if(TryGetValue(SmsFrom, line, out string from))
           newSms.From = from;
+        if(line.ToLowerInvariant() == "from=info")
+        {
+          newSms.From = "Info";
+        }
         if(TryGetValue(SmsMessage, line, out string message))
           newSms.Message = message;
         if(TryGetValue(SmsUnread, line, out string unread))
